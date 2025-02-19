@@ -1,5 +1,6 @@
 package com.ruble.jmanga
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +10,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ruble.jmanga.adapter.MangaAdapter
 import com.ruble.jmanga.api.RetrofitClient
@@ -21,14 +22,16 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 class HomeFragment : Fragment() {
-    private lateinit var recentUpdatesRecycler: RecyclerView
+    private lateinit var updatesRecycler: RecyclerView
     private lateinit var hotUpdatesRecycler: RecyclerView
-    private lateinit var popularRankingRecycler: RecyclerView
+    private lateinit var popularMangaRecycler: RecyclerView
+    private lateinit var newMangaRecycler: RecyclerView
     private lateinit var progressBar: ProgressBar
 
-    private val recentAdapter = MangaAdapter()
-    private val hotAdapter = MangaAdapter()
-    private val popularAdapter = MangaAdapter()
+    private val updatesAdapter = MangaAdapter()
+    private val hotUpdatesAdapter = MangaAdapter()
+    private val popularMangaAdapter = MangaAdapter()
+    private val newMangaAdapter = MangaAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,21 +47,29 @@ class HomeFragment : Fragment() {
         progressBar = view.findViewById(R.id.progress_bar)
 
         // 初始化RecyclerViews
-        recentUpdatesRecycler = view.findViewById(R.id.recent_updates_recycler)
+        updatesRecycler = view.findViewById(R.id.updates_recycler)
         hotUpdatesRecycler = view.findViewById(R.id.hot_updates_recycler)
-        popularRankingRecycler = view.findViewById(R.id.popular_ranking_recycler)
+        popularMangaRecycler = view.findViewById(R.id.popular_manga_recycler)
+        newMangaRecycler = view.findViewById(R.id.new_manga_recycler)
 
-        // 设置布局管理器为水平滚动
+        // 设置布局管理器为网格布局，两行显示
         context?.let { ctx ->
-            recentUpdatesRecycler.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
-            hotUpdatesRecycler.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
-            popularRankingRecycler.layoutManager = LinearLayoutManager(ctx, LinearLayoutManager.HORIZONTAL, false)
+            val gridLayoutManager1 = GridLayoutManager(ctx, 2, GridLayoutManager.HORIZONTAL, false)
+            val gridLayoutManager2 = GridLayoutManager(ctx, 2, GridLayoutManager.HORIZONTAL, false)
+            val gridLayoutManager3 = GridLayoutManager(ctx, 2, GridLayoutManager.HORIZONTAL, false)
+            val gridLayoutManager4 = GridLayoutManager(ctx, 2, GridLayoutManager.HORIZONTAL, false)
+
+            updatesRecycler.layoutManager = gridLayoutManager1
+            hotUpdatesRecycler.layoutManager = gridLayoutManager2
+            popularMangaRecycler.layoutManager = gridLayoutManager3
+            newMangaRecycler.layoutManager = gridLayoutManager4
         }
 
         // 设置适配器
-        recentUpdatesRecycler.adapter = recentAdapter
-        hotUpdatesRecycler.adapter = hotAdapter
-        popularRankingRecycler.adapter = popularAdapter
+        updatesRecycler.adapter = updatesAdapter
+        hotUpdatesRecycler.adapter = hotUpdatesAdapter
+        popularMangaRecycler.adapter = popularMangaAdapter
+        newMangaRecycler.adapter = newMangaAdapter
 
         // 加载数据
         loadData()
@@ -69,142 +80,45 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
                 Log.d("HomeFragment", "开始加载漫画数据...")
-                
-                // 在IO线程中执行网络请求
                 val response = withContext(Dispatchers.IO) {
-                    RetrofitClient.mangaApi.getMangaList()
+                    RetrofitClient.mangaApi.getUpdates()
                 }
                 
-                if (response.code == 200) {
+                if (response.code == 200 && response.data != null) {
                     Log.d("HomeFragment", "成功获取漫画数据")
-                    Log.d("HomeFragment", "响应数据: $response")
                     
-                    // 在IO线程中处理数据
-                    val mangaList = withContext(Dispatchers.Default) {
-                        val updates = mutableListOf<Manga>()
-                        
-                        // 处理热门更新
-                        response.data.data.hot_updates.forEach { update ->
-                            Log.d("HomeFragment", "处理漫画: ${update.title ?: update.chapter}")
-                            Log.d("HomeFragment", "漫画详情: $update")
-                            
-                            // 尝试从多个位置获取封面URL
-                            val coverUrl = when {
-                                !update.image_url.isNullOrEmpty() -> {
-                                    Log.d("HomeFragment", "使用update.image_url: ${update.image_url}")
-                                    update.image_url
-                                }
-                                !update.detail.image_url.isNullOrEmpty() -> {
-                                    Log.d("HomeFragment", "使用update.detail.image_url: ${update.detail.image_url}")
-                                    update.detail.image_url
-                                }
-                                else -> {
-                                    Log.w("HomeFragment", "未找到封面URL")
-                                    ""
-                                }
-                            }
-                            
-                            Log.d("HomeFragment", "封面URL: $coverUrl")
-                            
-                            updates.add(
-                                Manga(
-                                    title = update.title ?: update.chapter,
-                                    coverUrl = coverUrl,
-                                    updateTime = update.update_time ?: "",
-                                    latestChapter = update.chapter,
-                                    alt = update.detail.chapters.firstOrNull()?.title ?: ""
-                                )
-                            )
-                        }
-                        
-                        // 处理最近更新
-                        response.data.data.recent_updates?.forEach { update ->
-                            val coverUrl = when {
-                                !update.image_url.isNullOrEmpty() -> update.image_url
-                                !update.detail.image_url.isNullOrEmpty() -> update.detail.image_url
-                                else -> ""
-                            }
-
-                            updates.add(
-                                Manga(
-                                    title = update.title ?: update.chapter,
-                                    coverUrl = coverUrl,
-                                    updateTime = update.update_time ?: "",
-                                    latestChapter = update.chapter,
-                                    alt = update.detail.chapters.firstOrNull()?.title ?: ""
-                                )
-                            )
-                        }
-                        
-                        // 处理人气排行
-                        response.data.data.popular_updates?.forEach { update ->
-                            val coverUrl = when {
-                                !update.image_url.isNullOrEmpty() -> update.image_url
-                                !update.detail.image_url.isNullOrEmpty() -> update.detail.image_url
-                                else -> ""
-                            }
-
-                            updates.add(
-                                Manga(
-                                    title = update.title ?: update.chapter,
-                                    coverUrl = coverUrl,
-                                    updateTime = update.update_time ?: "",
-                                    latestChapter = update.chapter,
-                                    alt = update.detail.chapters.firstOrNull()?.title ?: ""
-                                )
-                            )
-                        }
-                        
-                        updates
-                    }
-
-                    Log.d("HomeFragment", "处理完成，漫画数量: ${mangaList.size}")
-
-                    // 获取最近更新（取前5个）
-                    val recent = mangaList.take(5)
-                    
-                    // 获取热门更新（随机选择5个）
-                    val hot = mangaList.shuffled().take(5)
-                    
-                    // 获取人气排行（随机选择5个）
-                    val popular = mangaList.shuffled().take(5)
-
-                    // 在主线程中更新UI
-                    withContext(Dispatchers.Main) {
-                        recentAdapter.updateData(recent)
-                        hotAdapter.updateData(hot)
-                        popularAdapter.updateData(popular)
-                        showLoading(false)
+                    // 更新界面
+                    response.data.updates?.let { updates ->
+                        updatesAdapter.submitList(updates)
                     }
                     
-                    Log.d("HomeFragment", "数据加载完成并更新UI")
+                    response.data.hot_updates?.let { hotUpdates ->
+                        hotUpdatesAdapter.submitList(hotUpdates)
+                    }
+                    
+                    response.data.popular_manga?.let { popularManga ->
+                        popularMangaAdapter.submitList(popularManga)
+                    }
+                    
+                    response.data.new_manga?.let { newManga ->
+                        newMangaAdapter.submitList(newManga)
+                    }
                 } else {
-                    throw Exception("API返回错误：${response.message}")
+                    Log.e("HomeFragment", "加载失败：服务器返回错误 code=${response.code}")
+                    showError("加载失败：服务器返回错误 code=${response.code}")
                 }
             } catch (e: Exception) {
                 Log.e("HomeFragment", "加载失败", e)
-                withContext(Dispatchers.Main) {
-                    showLoading(false)
-                    val errorMessage = when (e) {
-                        is UnknownHostException -> "无法连接到服务器，请检查网络连接"
-                        is SocketTimeoutException -> "连接服务器超时，请稍后重试"
-                        is retrofit2.HttpException -> {
-                            val code = e.code()
-                            when (code) {
-                                404 -> "找不到数据接口，请确认服务器配置"
-                                500 -> "服务器内部错误"
-                                else -> "HTTP错误: $code"
-                            }
-                        }
-                        else -> "加载失败：${e.message}"
-                    }
-                    Log.e("HomeFragment", "错误详情: $errorMessage", e)
-                    context?.let {
-                        Toast.makeText(it, errorMessage, Toast.LENGTH_LONG).show()
-                    }
-                }
+                showError("加载失败：${e.message}")
+                Log.e("HomeFragment", "错误详情: ${e.message}", e)
+            } finally {
+                showLoading(false)
             }
         }
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showLoading(show: Boolean) {

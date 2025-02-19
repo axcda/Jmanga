@@ -15,24 +15,23 @@
             android:orientation="vertical"
             android:padding="8dp">
 
-            <!-- 近期更新区块 -->
+            <!-- 更新区块 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginBottom="8dp"
-                android:text="近期更新"
+                android:text="更新"
                 android:textColor="#333333"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recent_updates_recycler"
+                android:id="@+id/updates_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="420dp"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
@@ -50,31 +49,49 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/hot_updates_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="420dp"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
-            <!-- 人气排行区块 -->
+            <!-- 人气漫画区块 -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="4dp"
                 android:layout_marginBottom="8dp"
-                android:text="人气排行"
+                android:text="人气漫画"
                 android:textColor="#333333"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/popular_ranking_recycler"
+                android:id="@+id/popular_manga_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="420dp"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp" />
+
+            <!-- 新漫画区块 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginBottom="8dp"
+                android:text="新漫画"
+                android:textColor="#333333"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/new_manga_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="420dp"
+                android:layout_marginBottom="16dp"
+                android:clipToPadding="false"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 

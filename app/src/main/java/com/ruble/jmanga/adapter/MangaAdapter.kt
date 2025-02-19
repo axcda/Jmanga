@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -15,15 +17,9 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.ruble.jmanga.R
-import com.ruble.jmanga.model.Manga
+import com.ruble.jmanga.model.MangaItem
 
-class MangaAdapter : RecyclerView.Adapter<MangaAdapter.MangaViewHolder>() {
-    private var mangas: List<Manga> = emptyList()
-
-    fun updateData(newMangas: List<Manga>) {
-        mangas = newMangas
-        notifyDataSetChanged()
-    }
+class MangaAdapter : ListAdapter<MangaItem, MangaAdapter.MangaViewHolder>(MangaDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MangaViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -32,29 +28,21 @@ class MangaAdapter : RecyclerView.Adapter<MangaAdapter.MangaViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: MangaViewHolder, position: Int) {
-        holder.bind(mangas[position])
+        holder.bind(getItem(position))
     }
-
-    override fun getItemCount(): Int = mangas.size
 
     class MangaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val coverImageView: ImageView = itemView.findViewById(R.id.manga_cover)
         private val titleTextView: TextView = itemView.findViewById(R.id.manga_title)
-        private val updateTextView: TextView = itemView.findViewById(R.id.manga_update)
 
-        fun bind(manga: Manga) {
+        fun bind(manga: MangaItem) {
             titleTextView.text = manga.title
-            updateTextView.text = if (manga.updateTime.isNotEmpty()) {
-                "${manga.updateTime} ${manga.latestChapter}"
-            } else {
-                manga.latestChapter
-            }
 
-            Log.d("MangaAdapter", "加载图片: ${manga.title} - ${manga.coverUrl}")
+            Log.d("MangaAdapter", "加载图片: ${manga.title} - ${manga.image_url}")
             
-            if (manga.coverUrl.isNotEmpty()) {
+            if (!manga.image_url.isNullOrEmpty()) {
                 Glide.with(itemView.context)
-                    .load(manga.coverUrl)
+                    .load(manga.image_url)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.placeholder_manga)
                     .error(R.drawable.error_manga)
@@ -65,7 +53,7 @@ class MangaAdapter : RecyclerView.Adapter<MangaAdapter.MangaViewHolder>() {
                             target: Target<Drawable>,
                             isFirstResource: Boolean
                         ): Boolean {
-                            Log.e("MangaAdapter", "图片加载失败: ${manga.title} - ${manga.coverUrl}", e)
+                            Log.e("MangaAdapter", "图片加载失败: ${manga.title} - ${manga.image_url}", e)
                             e?.logRootCauses("MangaAdapter")
                             return false
                         }
@@ -87,5 +75,15 @@ class MangaAdapter : RecyclerView.Adapter<MangaAdapter.MangaViewHolder>() {
                 coverImageView.setImageResource(R.drawable.placeholder_manga)
             }
         }
+    }
+}
+
+private class MangaDiffCallback : DiffUtil.ItemCallback<MangaItem>() {
+    override fun areItemsTheSame(oldItem: MangaItem, newItem: MangaItem): Boolean {
+        return oldItem.link == newItem.link
+    }
+
+    override fun areContentsTheSame(oldItem: MangaItem, newItem: MangaItem): Boolean {
+        return oldItem == newItem
     }
 } 

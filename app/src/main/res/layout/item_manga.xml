@@ -29,22 +29,19 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="2"
-            android:padding="4dp"
+            android:minLines="2"
+            android:padding="8dp"
             android:textColor="#333333"
             android:textSize="12sp"
-            android:textStyle="bold"
-            tools:text="漫画标题" />
+            android:gravity="top"
+            android:lineSpacingExtra="2dp"
+            tools:text="漫画标题漫画标题漫画标题漫画标题漫画标题漫画标题" />
 
         <TextView
             android:id="@+id/manga_update"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:paddingHorizontal="4dp"
-            android:paddingBottom="4dp"
-            android:textColor="#666666"
-            android:textSize="10sp"
+            android:visibility="gone"
             tools:text="更新时间" />
     </LinearLayout>
 </androidx.cardview.widget.CardView> 

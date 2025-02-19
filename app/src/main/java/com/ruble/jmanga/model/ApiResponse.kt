@@ -2,9 +2,22 @@ package com.ruble.jmanga.model
 
 data class ApiResponse(
     val code: Int,
-    val data: ResponseData,
+    val data: MangaData,
     val message: String? = null,
     val timestamp: Long? = null
+)
+
+data class MangaData(
+    val hot_updates: List<MangaItem>,
+    val new_manga: List<MangaItem>,
+    val popular_manga: List<MangaItem>,
+    val updates: List<MangaItem>
+)
+
+data class MangaItem(
+    val image_url: String?,
+    val link: String,
+    val title: String
 )
 
 data class ResponseData(
@@ -12,24 +25,8 @@ data class ResponseData(
     val data: MangaData
 )
 
-data class MangaData(
-    val hot_updates: List<MangaUpdate>,
-    val recent_updates: List<MangaUpdate>? = null,
-    val popular_updates: List<MangaUpdate>? = null
-)
-
-data class MangaUpdate(
-    val chapter: String,
-    val detail: MangaDetail,
-    val title: String? = null,
-    val cover_url: String? = null,
-    val image_url: String? = null,
-    val update_time: String? = null
-)
-
 data class MangaDetail(
     val chapters: List<Chapter>,
-    val cover_url: String? = null,
     val image_url: String? = null,
     val title: String? = null
 )
