@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="120dp"
+    android:layout_height="200dp"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/manga_cover"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            android:adjustViewBounds="true"
+            android:background="#EEEEEE"
+            tools:src="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/manga_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="2"
+            android:padding="4dp"
+            android:textColor="#333333"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="漫画标题" />
+
+        <TextView
+            android:id="@+id/manga_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:paddingHorizontal="4dp"
+            android:paddingBottom="4dp"
+            android:textColor="#666666"
+            android:textSize="10sp"
+            tools:text="更新时间" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView> 
