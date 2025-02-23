@@ -6,14 +6,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.ruble.jmanga.adapter.MangaAdapter
 import com.ruble.jmanga.api.RetrofitClient
+import com.ruble.jmanga.cloudflare.CloudflareSolver
 import com.ruble.jmanga.model.Manga
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class HomeFragment : Fragment() {
     private lateinit var hotUpdatesRecycler: RecyclerView
     private lateinit var popularMangaRecycler: RecyclerView
     private lateinit var newMangaRecycler: RecyclerView
-    private lateinit var progressBar: ProgressBar
+    private lateinit var swipeRefresh: SwipeRefreshLayout
 
     private val updatesAdapter = MangaAdapter()
     private val hotUpdatesAdapter = MangaAdapter()
@@ -44,9 +45,8 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progressBar = view.findViewById(R.id.progress_bar)
-
-        // 初始化RecyclerViews
+        // 初始化视图
+        swipeRefresh = view.findViewById(R.id.swipe_refresh)
         updatesRecycler = view.findViewById(R.id.updates_recycler)
         hotUpdatesRecycler = view.findViewById(R.id.hot_updates_recycler)
         popularMangaRecycler = view.findViewById(R.id.popular_manga_recycler)
@@ -71,21 +71,48 @@ class HomeFragment : Fragment() {
         popularMangaRecycler.adapter = popularMangaAdapter
         newMangaRecycler.adapter = newMangaAdapter
 
+        // 设置下拉刷新
+        swipeRefresh.setOnRefreshListener {
+            loadData()
+        }
+
+        // 预处理 Cloudflare 挑战
+        preSolveCloudfareChallenge()
+
         // 加载数据
         loadData()
     }
 
+    private fun preSolveCloudfareChallenge() {
+        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                Log.d(TAG, "开始预处理 Cloudflare 挑战...")
+                val testUrl = "https://cncover.godamanga.online/"
+                when (val result = CloudflareSolver.getInstance(requireContext()).solve(testUrl)) {
+                    is CloudflareSolver.Result.Success -> {
+                        Log.d(TAG, "Cloudflare 挑战预处理成功")
+                    }
+                    is CloudflareSolver.Result.Error -> {
+                        Log.e(TAG, "Cloudflare 挑战预处理失败: ${result.exception.message}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Cloudflare 挑战预处理出错", e)
+            }
+        }
+    }
+
     private fun loadData() {
-        showLoading(true)
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                Log.d("HomeFragment", "开始加载漫画数据...")
+                swipeRefresh.isRefreshing = true
+                Log.d(TAG, "开始加载漫画数据...")
                 val response = withContext(Dispatchers.IO) {
-                    RetrofitClient.mangaApi.getUpdates()
+                    RetrofitClient.mangaApi.getHomeData()
                 }
                 
                 if (response.code == 200 && response.data != null) {
-                    Log.d("HomeFragment", "成功获取漫画数据")
+                    Log.d(TAG, "成功获取漫画数据")
                     
                     // 更新界面
                     response.data.updates?.let { updates ->
@@ -104,25 +131,20 @@ class HomeFragment : Fragment() {
                         newMangaAdapter.submitList(newManga)
                     }
                 } else {
-                    Log.e("HomeFragment", "加载失败：服务器返回错误 code=${response.code}")
+                    Log.e(TAG, "加载失败：服务器返回错误 code=${response.code}")
                     showError("加载失败：服务器返回错误 code=${response.code}")
                 }
             } catch (e: Exception) {
-                Log.e("HomeFragment", "加载失败", e)
+                Log.e(TAG, "加载失败", e)
                 showError("加载失败：${e.message}")
-                Log.e("HomeFragment", "错误详情: ${e.message}", e)
             } finally {
-                showLoading(false)
+                swipeRefresh.isRefreshing = false
             }
         }
     }
 
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun showLoading(show: Boolean) {
-        progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     companion object {

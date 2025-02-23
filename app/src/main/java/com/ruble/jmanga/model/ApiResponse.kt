@@ -2,9 +2,16 @@ package com.ruble.jmanga.model
 
 data class ApiResponse(
     val code: Int,
-    val data: MangaData,
-    val message: String? = null,
-    val timestamp: Long? = null
+    val message: String,
+    val data: HomeData?,
+    val timestamp: Long
+)
+
+data class HomeData(
+    val updates: List<Manga>?,
+    val hot_updates: List<Manga>?,
+    val popular_manga: List<Manga>?,
+    val new_manga: List<Manga>?
 )
 
 data class MangaData(
@@ -15,7 +22,7 @@ data class MangaData(
 )
 
 data class MangaItem(
-    val image_url: String?,
+    val cover: String?,
     val link: String,
     val title: String
 )

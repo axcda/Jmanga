@@ -17,8 +17,12 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(HomeFragment.newInstance())
                     true
                 }
+                R.id.navigation_search -> {
+                    loadFragment(SearchFragment.newInstance())
+                    true
+                }
                 R.id.navigation_explore -> {
-                    // TODO: 实现探索页面
+                    loadFragment(ExploreFragment.newInstance())
                     true
                 }
                 R.id.navigation_english_manga -> {

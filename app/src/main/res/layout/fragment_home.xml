@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/swipe_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#F5F5F5">
+        android:background="#F5F5F5"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,9 +31,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/updates_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
@@ -49,9 +52,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/hot_updates_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
@@ -69,9 +73,10 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/popular_manga_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
@@ -89,20 +94,15 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/new_manga_recycler"
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
+                android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"
                 android:paddingStart="4dp"
                 android:paddingEnd="4dp" />
 
         </LinearLayout>
-    </ScrollView>
 
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
+    </androidx.core.widget.NestedScrollView>
 
-</FrameLayout> 
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout> 
