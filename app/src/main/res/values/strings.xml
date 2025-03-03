@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Jmanga</string>
+    <string name="manga_image_description">漫画图片</string>
 </resources>

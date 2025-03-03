@@ -33,6 +33,8 @@ class HomeFragment : Fragment() {
     private val hotUpdatesAdapter = MangaAdapter()
     private val popularMangaAdapter = MangaAdapter()
     private val newMangaAdapter = MangaAdapter()
+    
+    private val FRAGMENT_TAG = "HomeFragment"
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +72,18 @@ class HomeFragment : Fragment() {
         hotUpdatesRecycler.adapter = hotUpdatesAdapter
         popularMangaRecycler.adapter = popularMangaAdapter
         newMangaRecycler.adapter = newMangaAdapter
+        
+        // 设置点击事件
+        val mangaClickListener = object : MangaAdapter.OnMangaClickListener {
+            override fun onMangaClick(mangaId: String) {
+                navigateToMangaDetail(mangaId)
+            }
+        }
+        
+        updatesAdapter.setOnMangaClickListener(mangaClickListener)
+        hotUpdatesAdapter.setOnMangaClickListener(mangaClickListener)
+        popularMangaAdapter.setOnMangaClickListener(mangaClickListener)
+        newMangaAdapter.setOnMangaClickListener(mangaClickListener)
 
         // 设置下拉刷新
         swipeRefresh.setOnRefreshListener {
@@ -81,6 +95,16 @@ class HomeFragment : Fragment() {
 
         // 加载数据
         loadData()
+    }
+    
+    // 跳转到漫画详情页面
+    private fun navigateToMangaDetail(mangaId: String) {
+        Log.d(FRAGMENT_TAG, "跳转到漫画详情页面: $mangaId")
+        val detailFragment = MangaDetailFragment.newInstance(mangaId)
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, detailFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun preSolveCloudfareChallenge() {

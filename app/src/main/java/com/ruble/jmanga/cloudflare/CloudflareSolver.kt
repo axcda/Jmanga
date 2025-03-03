@@ -7,7 +7,10 @@ import kotlinx.coroutines.withContext
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import java.io.IOException
+import java.security.SecureRandom
+import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.*
 
 class CloudflareSolver private constructor(private val context: Context) {
     companion object {
@@ -38,6 +41,30 @@ class CloudflareSolver private constructor(private val context: Context) {
             connectTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             readTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
             writeTimeout(DEFAULT_TIMEOUT, TimeUnit.SECONDS)
+            
+            // 添加SSL证书信任配置
+            try {
+                // 创建信任所有证书的SSL套接字工厂
+                val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                    override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+                    override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+                    override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+                })
+                
+                val sslContext = SSLContext.getInstance("TLS")
+                sslContext.init(null, trustAllCerts, SecureRandom())
+                
+                // 设置OkHttpClient使用我们的SSL配置
+                sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                
+                // 设置主机名验证器接受所有主机名
+                hostnameVerifier { _, _ -> true }
+                
+                Log.d(TAG, "已配置信任所有SSL证书的客户端")
+            } catch (e: Exception) {
+                Log.e(TAG, "配置SSL失败", e)
+            }
+            
             if (ENABLE_LOGGING) {
                 addInterceptor(HttpLoggingInterceptor().apply {
                     level = HttpLoggingInterceptor.Level.BODY

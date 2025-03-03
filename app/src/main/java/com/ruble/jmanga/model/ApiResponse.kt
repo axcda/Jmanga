@@ -36,9 +36,4 @@ data class MangaDetail(
     val chapters: List<Chapter>,
     val image_url: String? = null,
     val title: String? = null
-)
-
-data class Chapter(
-    val link: String,
-    val title: String
 ) 

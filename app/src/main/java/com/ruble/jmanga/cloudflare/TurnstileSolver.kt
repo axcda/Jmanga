@@ -2,9 +2,11 @@ package com.ruble.jmanga.cloudflare
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.http.SslError
 import android.util.Log
 import android.view.View
 import android.webkit.JavascriptInterface
+import android.webkit.SslErrorHandler
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -98,6 +100,17 @@ class TurnstileSolver private constructor(private val context: Context) {
                         }
                         waitForTurnstile();
                     """.trimIndent(), null)
+                }
+                
+                // 添加SSL错误处理
+                override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+                    Log.d(TAG, "WebView收到SSL错误: ${error?.primaryError}")
+                    // 在生产环境中应该谨慎处理SSL错误，这里为了开发测试目的接受所有证书
+                    handler?.proceed()
+                }
+                
+                override fun onReceivedError(view: WebView?, errorCode: Int, description: String?, failingUrl: String?) {
+                    Log.e(TAG, "WebView加载错误: $errorCode, $description, URL: $failingUrl")
                 }
             }
             

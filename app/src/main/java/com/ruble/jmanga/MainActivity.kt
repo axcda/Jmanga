@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.ruble.jmanga.ui.settings.SettingsFragment
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,16 +18,12 @@ class MainActivity : AppCompatActivity() {
                     loadFragment(HomeFragment.newInstance())
                     true
                 }
-                R.id.navigation_search -> {
-                    loadFragment(SearchFragment.newInstance())
-                    true
-                }
                 R.id.navigation_explore -> {
                     loadFragment(ExploreFragment.newInstance())
                     true
                 }
-                R.id.navigation_english_manga -> {
-                    // TODO: 实现英漫页面
+                R.id.navigation_settings -> {
+                    loadFragment(SettingsFragment.newInstance())
                     true
                 }
                 else -> false

@@ -41,12 +41,20 @@
 
         </LinearLayout>
 
-        <!-- 搜索结果列表 -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/search_results_recycler"
+        <!-- 添加SwipeRefreshLayout支持下拉刷新 -->
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false" />
+            android:layout_height="match_parent">
+
+            <!-- 搜索结果列表 -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/search_results_recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false" />
+        
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     </LinearLayout>
 
