@@ -109,13 +109,5 @@ https://github.com/axcda/crawler_manga
 
 本项目采用MIT许可证 - 详情请参阅 [LICENSE](LICENSE) 文件
 
-## 联系方式
-
-如有任何问题或建议，请通过以下方式联系我们：
-
-- 电子邮件：your.email@example.com
-- GitHub Issues：[https://github.com/yourusername/jmanga/issues](https://github.com/yourusername/jmanga/issues)
-
----
 
 **注意**：本应用仅供学习和研究使用，请尊重版权，不要用于非法用途。
