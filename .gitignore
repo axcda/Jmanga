@@ -13,3 +13,9 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Python虚拟环境
+/turnstile_solver/
+/venv/
+__pycache__/
+*.py[cod]
